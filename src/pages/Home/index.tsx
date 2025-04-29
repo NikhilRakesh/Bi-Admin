@@ -3,12 +3,13 @@ import MetricCard from "../../components/Analytics/MetricCard";
 import ProgressBar from "../../components/Analytics/ProgressBar";
 import PieChart from "../../components/Analytics/PieChart";
 import PackageIndicator from "../../components/Analytics/PackageIndicator";
-import LineChart from "../../components/Analytics/LineChart";
+// import LineChart from "../../components/Analytics/LineChart";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { logout } from "../../redux/features/auth/authSlice";
 import { token_api } from "../../lib/api";
 import { useEffect, useState } from "react";
+import IpLogsDashboard from "../../components/Analytics/IpLogsDashboard";
 
 interface DashboardData {
   buisness_signup_rates: {
@@ -44,35 +45,35 @@ interface DashboardData {
 }
 
 export default function Dashboard() {
-  const analyticsData = {
-    businesses: {
-      total: 1243,
-      byType: {
-        service: 542,
-        product: 387,
-        hybrid: 314,
-      },
-    },
-    users: {
-      total: 3562,
-      withBusiness: 1243,
-      withoutBusiness: 2319,
-    },
-    packages: {
-      tier1: 487,
-      tier2: 312,
-      tier3: 224,
-      noPackage: 220,
-    },
-    listings: {
-      products: 2154,
-      services: 1783,
-    },
-    growth: {
-      businesses: [120, 190, 140, 210, 180, 230, 260],
-      users: [200, 300, 400, 500, 600, 700, 800],
-    },
-  };
+  // const analyticsData = {
+  //   businesses: {
+  //     total: 1243,
+  //     byType: {
+  //       service: 542,
+  //       product: 387,
+  //       hybrid: 314,
+  //     },
+  //   },
+  //   users: {
+  //     total: 3562,
+  //     withBusiness: 1243,
+  //     withoutBusiness: 2319,
+  //   },
+  //   packages: {
+  //     tier1: 487,
+  //     tier2: 312,
+  //     tier3: 224,
+  //     noPackage: 220,
+  //   },
+  //   listings: {
+  //     products: 2154,
+  //     services: 1783,
+  //   },
+  //   growth: {
+  //     businesses: [120, 190, 140, 210, 180, 230, 260],
+  //     users: [200, 300, 400, 500, 600, 700, 800],
+  //   },
+  // };
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
@@ -83,7 +84,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashBoardData();
-    fetchIpTrackLog()
   }, []);
 
   async function fetchDashBoardData() {
@@ -100,29 +100,11 @@ export default function Dashboard() {
       console.log("error on fetchDashBoardData:", error);
     }
   }
-  
-  async function fetchIpTrackLog() {
-    try {
-      const response = await token_api(
-        user?.access_token,
-        user?.refresh_token
-      ).get("badmin/analytics/requestlog/");
-
-      if (response.status === 200) {
-        console.log(response.data.data);
-      }
-    } catch (error) {
-      console.log("error on fetchDashBoardData:", error);
-    }
-  }
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
-  };  
-
-  console.log(dashboardData);
-  
+  };
 
   return dashboardData ? (
     <div className="max-h-screen  p-6 w-full overflow-y-auto ">
@@ -153,8 +135,8 @@ export default function Dashboard() {
         />
         <MetricCard
           icon={<FiPackage className="text-purple-500" />}
-          title="Tier 1 Subscriptions"
-          value={dashboardData?.tier_1_subs}
+          title="Total Services"
+          value={dashboardData?.total_services}
           trend="5% increase"
         />
         <MetricCard
@@ -235,19 +217,28 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-gray-300">
-          <h2 className="text-xl font-semibold mb-4">Business Registrations</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold mb-4">
+              Business Registrations
+            </h2>
+            <p className="text-xs text-orange-400">under development</p>
+          </div>
           <LineChart
             data={analyticsData.growth.businesses}
             color="text-blue-500"
           />
         </div>
         <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-gray-300">
-          <h2 className="text-xl font-semibold mb-4">User Registrations</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold mb-4">User Registrations</h2>
+            <p className="text-xs text-orange-400">under development</p>
+          </div>
           <LineChart data={analyticsData.growth.users} color="text-green-500" />
         </div>
-      </div>
+      </div> */}
+      <IpLogsDashboard />
     </div>
   ) : null;
 }

@@ -8,15 +8,14 @@ import {
 import { Link } from "react-router-dom";
 
 export default function Header() {
-  
   const iconLinks = [
     { Icon: MdOutlineDashboard, path: "/" },
-    { Icon: MdBusinessCenter, path: "/business" },
-    { Icon: MdOutlineProductionQuantityLimits, path: "/production" },
-    { Icon: ImUsers, path: "/users" },
-    { Icon: FaChartLine, path: "/chart" },
-    { Icon: MdBusinessCenter, path: "/business2" }, 
-    { Icon: FaBlackTie , path: "/business2" }, 
+    { Icon: MdBusinessCenter, path: "/" },
+    { Icon: MdOutlineProductionQuantityLimits, path: "/" },
+    { Icon: ImUsers, path: "/" },
+    { Icon: FaChartLine, path: "/" },
+    { Icon: MdBusinessCenter, path: "/" },
+    { Icon: FaBlackTie, path: "/" },
   ];
 
   return (
