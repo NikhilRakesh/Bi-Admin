@@ -5,6 +5,7 @@ import { IoIosClose } from "react-icons/io";
 import { TfiLocationPin } from "react-icons/tfi";
 import { FiUsers } from "react-icons/fi";
 import { BiCodeCurly } from "react-icons/bi";
+import DateRangeModal from "./DateRangeModal";
 
 interface IpLogEntry {
   ip_address: string;
@@ -24,14 +25,24 @@ interface IpLogsResponse {
   results: IpLogEntry[];
 }
 
+interface DailyCount {
+  count: number;
+  start_date: string;
+  end_date: string;
+  message: string;
+}
+
 const IpLogsDashboard = () => {
   const [data, setData] = useState<IpLogsResponse | null>(null);
   const { user } = useAppSelector((state) => state.auth);
   const [expandedIp, setExpandedIp] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false);
+  const [dailyCount, setDailyCount] = useState<DailyCount | null>(null);
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
 
   useEffect(() => {
     fetchIpTrackLog(null);
+    fetchTodaysIPCount(null, null);
   }, []);
 
   async function fetchIpTrackLog(url: string | null) {
@@ -53,6 +64,31 @@ const IpLogsDashboard = () => {
     }
   }
 
+  async function fetchTodaysIPCount(start: string | null, end: string | null) {
+    try {
+      let response;
+      {
+        start && end
+          ? (response = await token_api(
+              user?.access_token,
+              user?.refresh_token
+            ).get(
+              `analytics/log_count/?start_date=${start}&end_date=${end}`
+            ))
+          : (response = await token_api(
+              user?.access_token,
+              user?.refresh_token
+            ).get("analytics/log_count/"));
+      }
+
+      if (response.status === 200) {
+        setDailyCount(response.data);
+      }
+    } catch (error) {
+      console.log("error on fetchDashBoardData:", error);
+    }
+  }
+
   const toggleExpand = (ip: string) => {
     setExpandedIp(expandedIp === ip ? null : ip);
   };
@@ -60,15 +96,8 @@ const IpLogsDashboard = () => {
   return data ? (
     <div className="">
       <div className="w-full">
-        {/* <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">IP Access Logs</h1>
-          <p className="mt-2 text-gray-600">
-            Total {data.count} records • {data.page_size} per page
-          </p>
-        </div> */}
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-[#fdfcf8] border border-gray-300 rounded-xl shadow-sm p-6">
+          <div className="bg-[#fdfcf8] border border-[#c5b648] rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-lg bg-opacity-10 bg-gray-500">
                 <TfiLocationPin className="text-red-500" />
@@ -79,22 +108,28 @@ const IpLogsDashboard = () => {
               {data.count}
             </p>
           </div>
-          <div className="bg-[#fdfcf8] border border-gray-300 rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-opacity-10 bg-gray-500">
-                <FiUsers className="text-green-500" />
+          <div className="bg-[#fdfcf8] border border-[#c5b648] rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between  mb-4">
+              <div className="flex items-center gap-3 ">
+                <div className="p-2 rounded-lg bg-opacity-10 bg-gray-500">
+                  <FiUsers className="text-green-500" />
+                </div>
+                <h3 className="text-sm font-medium text-gray-500">
+                  Todays IPs Count
+                </h3>
               </div>
-              <h3 className="text-sm font-medium text-gray-500">
-                Todays IPs Count
-              </h3>
+              <button  onClick={() => setIsDateModalOpen(true)} className="bg-black text-gray-300 text-sm px-2 py-1 rounded-md">
+                {" "}
+                Select Date Range
+              </button>
             </div>
             <p className="mt-2 text-3xl font-semibold text-gray-900">
-              {data.page_size}
+              {dailyCount?.count}
             </p>
           </div>
-          <div className="bg-[#fdfcf8] border border-gray-300 rounded-xl shadow-sm p-6">
-            <div className=" flex justify-between items-center">
-              <div className="flex items-center gap-3 mb-4">
+          <div className="bg-[#fdfcf8] border border-[#c5b648] rounded-xl shadow-sm p-6">
+            <div className=" flex justify-between items-center mb-4">
+              <div className="flex items-center gap-3 ">
                 <div className="p-2 rounded-lg bg-opacity-10 bg-gray-500">
                   <BiCodeCurly className="text-blue-500" />
                 </div>
@@ -138,10 +173,10 @@ const IpLogsDashboard = () => {
           <div className="fixed top-0 w-full bg-gray-800 inset-0 flex justify-center bg-opacity-50 max-h-screen overflow-hidden py-10">
             <IoIosClose
               onClick={() => setOpenModal(false)}
-              className="text-gray-200 absolute top-5 right-5"
+              className="text-gray-200 absolute top-5 right-5 cursor-pointer"
               size={45}
             />
-            <div className="w-8/12 relative shadow-sm  rounded-xl">
+            <div className="w-8/12 relative shadow-sm  rounded-xl border border-[#c5b648] p-2 bg-white">
               <div className="bg-white   overflow-y-scroll h-full">
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -240,7 +275,7 @@ const IpLogsDashboard = () => {
                     </tbody>
                   </table>
                 </div>
-                <div className="mt-6 absolute bottom-0 py-2 px-4 w-full bg-gray-100 flex items-center justify-between">
+                <div className="mt-6 absolute bottom-0 py-2 px-4 w-full bg-gray-100 flex items-center justify-between h-fit left-0 right-0">
                   <div>
                     {data.links.previous && (
                       <button
@@ -272,6 +307,13 @@ const IpLogsDashboard = () => {
           </div>
         )}
       </div>
+      <DateRangeModal
+        isOpen={isDateModalOpen}
+        onClose={() => setIsDateModalOpen(false)}
+        onApply={(start, end) => {
+          fetchTodaysIPCount(start, end);
+        }}
+      />
     </div>
   ) : null;
 };

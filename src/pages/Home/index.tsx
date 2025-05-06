@@ -45,35 +45,6 @@ interface DashboardData {
 }
 
 export default function Dashboard() {
-  // const analyticsData = {
-  //   businesses: {
-  //     total: 1243,
-  //     byType: {
-  //       service: 542,
-  //       product: 387,
-  //       hybrid: 314,
-  //     },
-  //   },
-  //   users: {
-  //     total: 3562,
-  //     withBusiness: 1243,
-  //     withoutBusiness: 2319,
-  //   },
-  //   packages: {
-  //     tier1: 487,
-  //     tier2: 312,
-  //     tier3: 224,
-  //     noPackage: 220,
-  //   },
-  //   listings: {
-  //     products: 2154,
-  //     services: 1783,
-  //   },
-  //   growth: {
-  //     businesses: [120, 190, 140, 210, 180, 230, 260],
-  //     users: [200, 300, 400, 500, 600, 700, 800],
-  //   },
-  // };
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
@@ -125,7 +96,7 @@ export default function Dashboard() {
           icon={<FiBriefcase className="text-blue-500" />}
           title="Total Businesses"
           value={dashboardData?.total_buisnesses}
-          trend="12% increase"
+          trend=""
         />
         <MetricCard
           icon={<FiUsers className="text-green-500" />}
@@ -137,18 +108,18 @@ export default function Dashboard() {
           icon={<FiPackage className="text-purple-500" />}
           title="Total Services"
           value={dashboardData?.total_services}
-          trend="5% increase"
+          trend=""
         />
         <MetricCard
           icon={<FiShoppingBag className="text-amber-500" />}
           title="Total Products"
           value={dashboardData?.total_products}
-          trend="15% increase"
+          trend=""
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-gray-300">
+        <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-[#c5b648]">
           <h2 className="text-xl font-semibold mb-4">Business Types</h2>
           <div className="space-y-4">
             <ProgressBar
@@ -172,7 +143,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-gray-300">
+        <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-[#c5b648]">
           <h2 className="text-xl font-semibold mb-4">User Distribution</h2>
           <PieChart
             data={[
@@ -190,7 +161,7 @@ export default function Dashboard() {
           />
         </div>
 
-        <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-gray-300">
+        <div className="bg-[#fdfcf8] rounded-xl p-6 shadow-sm border border-[#c5b648]">
           <h2 className="text-xl font-semibold mb-4">Package Subscriptions</h2>
           <div className="space-y-4">
             <PackageIndicator
