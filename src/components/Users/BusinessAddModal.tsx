@@ -57,10 +57,6 @@ export default function BusinessAddModal({
         setBid(response.data.id);
         setBusinessData(data);
         setLoading(false);
-
-        response.data?.buisness_type === "Service"
-          ? setStep(step + 2)
-          : setStep(step + 1);
       }
     } catch (error) {
       console.log("error on handleAddUser:", error);
@@ -69,7 +65,14 @@ export default function BusinessAddModal({
     }
   }
 
+
   async function skip() {
+    if (step === 1) {
+      businessData?.buisness_type === "Service"
+        ? setStep(step + 2)
+        : setStep(step + 1);
+      return;
+    }
     if (step === 2) {
       businessData?.buisness_type === "Products & Services"
         ? setStep(step + 1)
@@ -81,7 +84,7 @@ export default function BusinessAddModal({
 
   async function onClick(pvid: number) {
     if (!pvid) return;
-
+    setLoading(true);
     try {
       const response = await token_api(
         user?.access_token,
@@ -93,12 +96,13 @@ export default function BusinessAddModal({
 
       if (response?.status === 200) {
         const redirectUrl = response?.data?.redirect_url;
-
+        setLoading(false);
         if (redirectUrl) {
           window.location.href = redirectUrl;
         }
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error fetching plans:", error);
     }
   }
@@ -112,7 +116,7 @@ export default function BusinessAddModal({
       />
 
       {step === 1 && (
-        <BusinessInformation uid={uid} onContinue={HandleAddBusiness} />
+        <BusinessInformation uid={uid} onContinue={HandleAddBusiness}  bid={bid} skip={skip} />
       )}
       {step === 2 && bid && <AddProduct bid={bid} skip={skip} />}
       {step === 3 && bid && <ServiceManager bid={bid} skip={skip} />}
