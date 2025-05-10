@@ -65,7 +65,6 @@ export default function BusinessAddModal({
     }
   }
 
-
   async function skip() {
     if (step === 1) {
       businessData?.buisness_type === "Service"
@@ -116,11 +115,23 @@ export default function BusinessAddModal({
       />
 
       {step === 1 && (
-        <BusinessInformation uid={uid} onContinue={HandleAddBusiness}  bid={bid} skip={skip} />
+        <BusinessInformation
+          uid={uid}
+          onContinue={HandleAddBusiness}
+          bid={bid}
+          skip={skip}
+        />
       )}
       {step === 2 && bid && <AddProduct bid={bid} skip={skip} />}
       {step === 3 && bid && <ServiceManager bid={bid} skip={skip} />}
-      {step === 4 && bid && <CategorySelector bid={bid} skip={skip} />}
+      {step === 4 && bid && (
+        <CategorySelector
+          bid={bid}
+          skip={skip}
+          loading={() => setLoading(true)}
+          notloading={() => setLoading(false)}
+        />
+      )}
       {step === 5 && <PricingPage onClick={onClick} close={close} />}
       {loading && <BusinessLoading />}
       <Toaster />

@@ -36,9 +36,13 @@ const CategorySkeleton = () => {
 export default function CategorySelector({
   bid,
   skip,
+  loading,
+  notloading,
 }: {
   bid: number;
   skip: () => void;
+  loading: () => void;
+  notloading: () => void;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [mainCategories, setMainCategories] = useState<Category[]>([]);
@@ -133,6 +137,7 @@ export default function CategorySelector({
       toast.error("Please select at least one subcategory");
       return;
     }
+    loading();
 
     try {
       const response = await token_api(
@@ -145,7 +150,8 @@ export default function CategorySelector({
 
       if (response.status === 200) {
         toast.success("Categories saved successfully");
-        skip()
+        notloading();
+        skip();
       }
     } catch (error) {
       console.error("Error saving categories:", error);
@@ -162,7 +168,7 @@ export default function CategorySelector({
     fetchMainCategories();
   };
 
-  useEffect(() => {        
+  useEffect(() => {
     fetchMainCategories();
   }, []);
 

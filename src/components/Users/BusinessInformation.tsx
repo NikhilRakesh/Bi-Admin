@@ -149,6 +149,7 @@ export default function BusinessInformation({
       return;
     } else if (!profilePic) {
       toast.error("Please select a photo.");
+      return;
     }
     try {
       const response = await get_api_form(
@@ -798,7 +799,7 @@ export default function BusinessInformation({
                   type="submit"
                   disabled={!isFormValid}
                   onClick={
-                    profilePic
+                    currentStep === 4
                       ? () => uploadProfilrPic()
                       : () => onContinue?.(formData)
                   }
@@ -808,7 +809,7 @@ export default function BusinessInformation({
                       : "bg-blue-400 cursor-not-allowed"
                   }`}
                 >
-                  {!profilePic ? "Complete Registration" : "Upload Image"}
+                  {currentStep !== 4 ? "Complete Registration" : "Upload Image"}
                 </button>
               )}
             </div>
