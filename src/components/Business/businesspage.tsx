@@ -1,98 +1,83 @@
-import {
-  FiSearch,
-  FiTrash2,
-  FiEye,
-  FiStar,
-  FiCheckCircle,
-  FiShield,
-} from "react-icons/fi";
-import { useState, useEffect } from "react";
+import { FiSearch, FiStar, FiCheckCircle, FiShield } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { FaRegEdit } from "react-icons/fa";
+import BusinessEditModal from "./BusinessEditModal";
+import { RiResetLeftFill } from "react-icons/ri";
 
 interface Business {
-  id: string;
+  id: number;
   name: string;
-  type: string;
-  package?: {
-    name: string;
-    level: "Basic" | "Standard" | "Premium";
-  };
+  building_name: string;
+  buisness_type: string;
+  image: string;
+  description: string;
+  pincode: string;
+  city: number;
+  locality: number;
+  state: string;
+  plan: string;
   rating: number;
   verified: boolean;
   assured: boolean;
-  city: string;
-  locality: string;
-  profileImage: string;
-  registrationDate: Date;
+  created_on: string;
 }
 
-export default function BusinessPages() {
-  const [businesses, setBusinesses] = useState<Business[]>([]);
+interface PaginationLinks {
+  next: string | null;
+  previous: string | null;
+}
+
+interface BusinessApiResponse {
+  count: number;
+  page_size: number;
+  results: Business[];
+  links: PaginationLinks;
+  total_buisness_count: number;
+  total_hybrid_buisness_count: number;
+  total_product_buisness_count: number;
+  total_service_buisness_count: number;
+}
+
+interface BusinessPagesProps {
+  businesses: BusinessApiResponse;
+  fetchBusinessData: (url?: string | null) => void;
+  render: () => void;
+  searchBusiness: (searchTerm: string) => void;
+}
+
+export default function BusinessPages({
+  businesses,
+  fetchBusinessData,
+  render,
+  searchBusiness,
+}: BusinessPagesProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(
     null
   );
-  const itemsPerPage = 10;
 
   useEffect(() => {
-    const mockBusinesses: Business[] = Array.from({ length: 25 }, (_, i) => ({
-      id: `biz-${i}`,
-      name: `Business ${i + 1}`,
-      type: ["Product", "Service", "Product", "Service"][
-        Math.floor(Math.random() * 4)
-      ],
-      package:
-        Math.random() > 0.3
-          ? {
-              name: ["Tire 1", "Tire 2", "Tire 3"][
-                Math.floor(Math.random() * 3)
-              ],
-              level: ["Basic", "Standard", "Premium"][
-                Math.floor(Math.random() * 3)
-              ] as any,
-            }
-          : undefined,
-      rating: Number((Math.random() * 5).toFixed(1)),
-      verified: Math.random() > 0.5,
-      assured: Math.random() > 0.7,
-      city: ["New York", "Los Angeles", "Chicago", "Houston"][
-        Math.floor(Math.random() * 4)
-      ],
-      locality: ["Downtown", "Uptown", "Midtown", "Suburb"][
-        Math.floor(Math.random() * 4)
-      ],
-      profileImage: `https://randomuser.me/api/portraits/${
-        Math.random() > 0.5 ? "men" : "women"
-      }/${Math.floor(Math.random() * 50)}.jpg`,
-      registrationDate: new Date(
-        Date.now() - Math.floor(Math.random() * 10000000000)
-      ),
-    }));
-    setBusinesses(mockBusinesses);
-  }, []);
+    if (searchTerm) {
+      searchBusiness(searchTerm);
+    } else {
+      render();
+    }
+  }, [searchTerm]);
 
-  const filteredBusinesses = businesses.filter(
-    (biz) =>
-      biz.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      biz.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      biz.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      biz.locality.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const paginationData = businesses;
+  const totalItems = paginationData?.count ?? 0;
+  const pageSize = paginationData?.page_size ?? 10;
+  const startItem = (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalItems);
+  const hasPrev = Boolean(paginationData?.links?.previous);
+  const hasNext = Boolean(paginationData?.links?.next);
 
-  const paginatedBusinesses = filteredBusinesses.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleDelete = (id: string) => {
-    setBusinesses(businesses.filter((biz) => biz.id !== id));
-    setIsDeleteModalOpen(false);
-  };
   return (
     <div>
       <div className="mb-6 flex items-center  justify-between">
-        <div className="relative w-1/2  ">
+        <div className="relative w-1/2 flex gap-3 ">
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
@@ -104,10 +89,21 @@ export default function BusinessPages() {
               setCurrentPage(1);
             }}
           />
+          <button
+            onClick={() => {
+              setSearchTerm(""), render();
+            }}
+            className="bg-red-100 px-7 py-1 rounded-md border border-red-500 text-red-500 flex items-center gap-2"
+          >
+            <RiResetLeftFill />
+            reset
+          </button>
         </div>
         <div className="bg-[#fdfcf8] border border-[#c5b648] px-4 py-2 rounded-lg shadow-sm">
           <span className="text-gray-600">Total Businesses: </span>
-          <span className="font-semibold">{filteredBusinesses.length}</span>
+          <span className="font-semibold">
+            {businesses.total_buisness_count}
+          </span>
         </div>
       </div>
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#c5b648]">
@@ -138,14 +134,14 @@ export default function BusinessPages() {
             </tr>
           </thead>
           <tbody className="bg-[#fdfcf8] divide-y divide-gray-200">
-            {paginatedBusinesses.map((business) => (
+            {businesses.results?.map((business) => (
               <tr key={business.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10">
                       <img
                         className="h-10 w-10 rounded-full"
-                        src={business.profileImage}
+                        src={business?.image}
                         alt={business.name}
                       />
                     </div>
@@ -154,27 +150,28 @@ export default function BusinessPages() {
                         {business.name}
                       </div>
                       <div className="text-sm text-gray-500">
-                        Registered:{" "}
-                        {business.registrationDate.toLocaleDateString()}
+                        Registered: {business.created_on}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{business.type}</div>
+                  <div className="text-sm text-gray-900">
+                    {business.buisness_type}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {business.package ? (
+                  {business.plan !== "Default Plan" ? (
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        business.package.level === "Premium"
+                        business.plan === "Tier 3"
                           ? "bg-purple-100 text-purple-800"
-                          : business.package.level === "Standard"
+                          : business.plan === "Tier 2"
                           ? "bg-blue-100 text-blue-800"
                           : "bg-green-100 text-green-800"
                       }`}
                     >
-                      {business.package.name} ({business.package.level})
+                      {business.plan}
                     </span>
                   ) : (
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
@@ -212,17 +209,13 @@ export default function BusinessPages() {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-4">
-                    <FiEye />
-                  </button>
                   <button
                     onClick={() => {
-                      setSelectedBusiness(business);
-                      setIsDeleteModalOpen(true);
+                      setSelectedBusiness(business), setIsModalOpen(true);
                     }}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-blue-600 hover:text-blue-900 mr-4"
                   >
-                    <FiTrash2 />
+                    <FaRegEdit />
                   </button>
                 </td>
               </tr>
@@ -231,21 +224,18 @@ export default function BusinessPages() {
         </table>
 
         <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
-          <span className="text-sm text-gray-700">
-            Showing{" "}
-            {Math.min(
-              (currentPage - 1) * itemsPerPage + 1,
-              filteredBusinesses.length
-            )}{" "}
-            to {Math.min(currentPage * itemsPerPage, filteredBusinesses.length)}{" "}
-            of {filteredBusinesses.length} businesses
+          <span className="text-sm font-ubuntu text-gray-700">
+            Showing {startItem} to {endItem} of {totalItems} users
           </span>
           <div className="flex space-x-2">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+              onClick={() => {
+                setCurrentPage((p) => Math.max(1, p - 1));
+                fetchBusinessData(businesses.links.previous);
+              }}
+              disabled={!hasPrev}
               className={`px-3 py-1 rounded ${
-                currentPage === 1
+                !hasPrev
                   ? "bg-gray-200 text-gray-500"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
@@ -253,10 +243,13 @@ export default function BusinessPages() {
               Previous
             </button>
             <button
-              onClick={() => setCurrentPage((p) => p + 1)}
-              disabled={currentPage * itemsPerPage >= filteredBusinesses.length}
+              onClick={() => {
+                setCurrentPage((p) => p + 1);
+                fetchBusinessData(businesses?.links.next);
+              }}
+              disabled={!hasNext}
               className={`px-3 py-1 rounded ${
-                currentPage * itemsPerPage >= filteredBusinesses.length
+                !hasNext
                   ? "bg-gray-200 text-gray-500"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
@@ -266,31 +259,15 @@ export default function BusinessPages() {
           </div>
         </div>
       </div>
-      {isDeleteModalOpen && selectedBusiness && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-            <p className="mb-6">
-              Are you sure you want to delete{" "}
-              <span className="font-semibold">{selectedBusiness.name}</span>?
-              This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(selectedBusiness.id)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                Delete Business
-              </button>
-            </div>
-          </div>
-        </div>
+      {selectedBusiness && (
+        <BusinessEditModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false), setSelectedBusiness(null);
+          }}
+          initialData={selectedBusiness}
+          render={render}
+        />
       )}
     </div>
   );

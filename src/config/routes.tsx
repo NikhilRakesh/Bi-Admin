@@ -1,18 +1,17 @@
 import { lazy } from "react";
 import Category from "../pages/Category";
-import Businessses from "../pages/Business";
-import BusinessPages from "../components/Business/businesspage";
 import Users from "../pages/Users";
+import Businesses from "../pages/Business";
 
 const Home = lazy(() => import("../pages/Home"));
 
-const BusinessRoutes=[
-  {
-    index: true,
-    element: <BusinessPages />,
-  },
+// const BusinessRoutes=[
+//   {
+//     index: true,
+//     element: <BusinessPages />,
+//   },
 
-]
+// ]
 
 export const routes = [
   {
@@ -25,9 +24,7 @@ export const routes = [
   },
   {
     path: "/businesses",
-   
-        element:( <Businessses />),
-        children: BusinessRoutes,
+    element: <Businesses />,
   },
   {
     path: "/users",
