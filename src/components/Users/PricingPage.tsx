@@ -17,6 +17,7 @@ interface PlanVariant {
 interface Plan {
   id: number;
   plan_name: string;
+  verbouse_name: string;
   average_time_spend: boolean;
   bi_assured: boolean;
   bi_certification: boolean;
@@ -101,22 +102,35 @@ const FEATURES_MAP: {
     description: "Detailed insights about your profile visitors",
   },
   {
-    key: "search_priority_1",
+    key: "search_priority_2",
     label: "Highest Search Priority",
     category: "Visibility",
     description: "Your business appears first in relevant searches",
   },
   {
-    key: "search_priority_2",
-    label: "High Search Priority",
-    category: "Visibility",
-    description: "Your business appears prominently in search results",
-  },
-  {
-    key: "search_priority_3",
+    key: "search_priority_1",
     label: "Standard Search Priority",
     category: "Visibility",
     description: "Standard visibility in search results",
+  },
+  {
+    key: "bi_assured",
+    label: "Bi Assured Tag",
+    category: "Trust & Verification",
+    description:
+      "Indicates that the business is verified and assured by our platform",
+  },
+  {
+    key: "bi_certification",
+    label: "Bi Certification",
+    category: "Trust & Verification",
+    description: "Official certification for trusted businesses",
+  },
+  {
+    key: "bi_verification",
+    label: "Bi Verification Badge",
+    category: "Trust & Verification",
+    description: "Verified identity and legitimacy of the business",
   },
 ];
 
@@ -223,12 +237,6 @@ const PricingPage = ({
 
   return (
     <div className="min-h-screen max-h-full overflow-y-scroll relative bg-gradient-to-br w-full  from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-      <button
-        onClick={close}
-        className="text-gray-300 absolute top-5 right-5 text-sm px-3 py-1 rounded-md bg-black"
-      >
-        skip
-      </button>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <motion.h1
@@ -278,7 +286,7 @@ const PricingPage = ({
                         isPopular ? "text-blue-600" : "text-gray-800"
                       }`}
                     >
-                      {plan.plan_name}
+                      {plan.verbouse_name}
                     </h2>
 
                     <div className="mb-6">
@@ -287,7 +295,9 @@ const PricingPage = ({
                           ₹{selectedVariant?.price}
                         </span>
                         <span className="text-gray-500 ml-1 mb-1">
-                          /{selectedVariant?.duration} days
+                          {index === 0
+                            ? "Lifetime"
+                            : `${selectedVariant?.duration} days`}
                         </span>
                       </div>
                       <div className="space-y-3">
@@ -314,7 +324,9 @@ const PricingPage = ({
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                               />
                               <span className="ml-3 text-gray-700 font-medium">
-                                {variant.duration} days
+                                {index === 0
+                                  ? "Lifetime"
+                                  : `${variant.duration} days`}
                               </span>
                             </div>
                             <span className="text-gray-900 font-bold">
@@ -413,22 +425,38 @@ const PricingPage = ({
                 </div>
 
                 <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      const selectedId = selectedVariants[plan.id];
-                      if (selectedId) onClick(selectedId, null);
-                    }}
-                    className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all ${
-                      isPopular
-                        ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md hover:from-blue-700 hover:to-blue-600"
-                        : "bg-white border border-blue-500 text-blue-600 hover:bg-blue-50"
-                    }`}
-                  >
-                    Get Started
-                    <FiArrowRight className="ml-2" />
-                  </motion.button>
+                  {index !== 0 ? (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        const selectedId = selectedVariants[plan.id];
+                        if (selectedId) onClick(selectedId, null);
+                      }}
+                      className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all ${
+                        isPopular
+                          ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md hover:from-blue-700 hover:to-blue-600"
+                          : "bg-white border border-blue-500 text-blue-600 hover:bg-blue-50"
+                      }`}
+                    >
+                      Get Started
+                      <FiArrowRight className="ml-2" />
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={close}
+                      className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all ${
+                        isPopular
+                          ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md hover:from-blue-700 hover:to-blue-600"
+                          : "bg-white border border-blue-500 text-blue-600 hover:bg-blue-50"
+                      }`}
+                    >
+                      Get Started
+                      <FiArrowRight className="ml-2" />
+                    </motion.button>
+                  )}
                 </div>
               </motion.div>
             );
@@ -448,7 +476,6 @@ const PricingPage = ({
         </div>
       </div>
 
-      {/* Feature Detail Modal */}
       <Transition appear show={!!selectedFeature} as={Fragment}>
         <Dialog
           as="div"
@@ -507,7 +534,6 @@ const PricingPage = ({
         </Dialog>
       </Transition>
 
-      {/* Comparison Modal */}
       <Transition appear show={showComparison} as={Fragment}>
         <Dialog
           as="div"

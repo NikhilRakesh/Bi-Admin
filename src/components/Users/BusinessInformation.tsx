@@ -99,8 +99,6 @@ export default function BusinessInformation({
     });
 
     const optionalValidations = [
-      !formData.incharge_number ||
-        validatePhoneNumber(formData.incharge_number),
       !formData.email || validateEmail(formData.email),
     ];
 
@@ -268,13 +266,13 @@ export default function BusinessInformation({
           "Please enter a valid 10-digit mobile number";
       }
 
-      if (
-        formData.incharge_number &&
-        !validatePhoneNumber(formData.incharge_number)
-      ) {
-        newErrors.incharge_number =
-          "Please enter a valid 10-digit mobile number";
-      }
+      // if (
+      //   formData.incharge_number &&
+      //   !validatePhoneNumber(formData.incharge_number)
+      // ) {
+      //   newErrors.incharge_number =
+      //     "Please enter a valid 10-digit mobile number";
+      // }
 
       if (formData.email && !validateEmail(formData.email)) {
         newErrors.email = "Please enter a valid email address";
@@ -284,9 +282,6 @@ export default function BusinessInformation({
     if (Object.keys(newErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...newErrors }));
       return;
-    }
-
-    if (currentStep === 4) {
     }
 
     setCurrentStep((prev) => Math.min(prev + 1, 4));
@@ -601,51 +596,6 @@ export default function BusinessInformation({
         )}
       </div>
 
-      {/* <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">
-          Business Profile Picture
-        </label>
-        <div className="flex items-center space-x-4">
-          <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-            {profilePicPreview ? (
-              <img
-                src={profilePicPreview}
-                alt="Profile preview"
-                className="w-full h-full object-cover rounded-lg"
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center text-gray-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-                <span className="text-xs mt-1">Add Photo</span>
-              </div>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleProfilePicChange}
-              className="hidden"
-            />
-          </label>
-          <div className="text-sm text-gray-500">
-            {profilePic
-              ? profilePic.name
-              : "Upload a profile picture for your business (optional)"}
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 
